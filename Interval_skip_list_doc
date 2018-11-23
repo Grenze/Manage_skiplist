@@ -1,0 +1,87 @@
+class Interval_skip_list_interval:
+private:
+	bool lbound, rbound;
+	Value inf, sup;
+public:
+	contains_value;
+	contains_interval;
+	operator == != <<
+
+template <class Interval_> 
+calss Interval_skip_list<-friend->IntervalSLnode, IntervalList<-friend->IntervalListElt;
+
+const int MAX_FORWARD = 48;
+
+class IntervalSLnode:// interval skip list node
+private:
+	bool is_header;
+	Value key;
+	IntervalSLnode** forward;
+	IntervalList<Interval>** markers;
+	IntervalList<Interval>* eqMarkers;
+	int ownerCount, topLevel;
+public:
+	constructor ~ for head node and non-head node;(level random problem)
+	IntervalSLnode* get_next();
+	Value getValue();
+	int level();
+	bool isHeader();
+	void print();
+
+
+
+class Interval_skip_list:
+private:
+	int maxLevel;
+	Random random;
+	IntervalSLnode<Interval>* header;
+	std::list<Interval> container;
+
+        typedef typename std::list<Interval>::iterator Interval_handle;
+        typedef IntervalListElt<Interval>* ILE_handle;
+	
+	int randomLevel();
+	IntervalSLnode<Interval>* search(Key, IntervalSLnode<Interval>** update);
+
+	//insert interval
+	IntervalSLnode<Interval>* insert(Key);
+	void adjustMarkersOnInsert(IntervalSLnode<Interval>* x,
+				   IntervalSLnode<Interval>** update);
+	void placeMarkers(IntervalSLnode<Interval>* left,
+			  IntervalSLndoe<Interval>* right, Interval_handle &I);
+	void insert(Interval_handle& I);//Interval_handle related to the interval container
+	//remove interval
+	Interval_handle removeMarkers<IntervalSLnode<Interval>* left, Interval& I);
+        void removeMarkFromLevel(const Interval& m, int i,
+                                 IntervalSLnode<Interval> *l,
+                                 IntervalSLnode<Interval>* r);
+	void adjustMarkersOnDelete(IntervalSLnode<Interval>* x,
+				 IntervalSLnode<Interval>** update);
+        void remove(IntervalSLnode<Interval>* x, IntervalSLnode<Interval>** update);
+public:
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

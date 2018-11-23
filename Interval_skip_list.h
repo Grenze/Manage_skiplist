@@ -6,8 +6,6 @@
 #define ISL_INTERVAL_SKIP_LIST_H
 
 
-
-
 #include <list>
 #include <iostream>
 
@@ -16,7 +14,6 @@
 
 namespace ISL {
 
-    class Interval;
     template <class Interval_>
     class IntervalList;
 
@@ -36,6 +33,7 @@ namespace ISL {
     template <class Interval_>
     class IntervalSLnode  // interval skip list node
     {
+    private:
         typedef Interval_ Interval;
         typedef typename Interval::Value Value;
         bool is_header;
@@ -43,8 +41,7 @@ namespace ISL {
 
         Value key;
         IntervalSLnode** forward;  // array of forward pointers
-        IntervalList<Interval>**   markers;  // array of interval markers,
-        // one for each pointer
+        IntervalList<Interval>**   markers;  // array of interval markers, one for each pointer
         IntervalList<Interval>* eqMarkers;   // markers for node itself
         int ownerCount;  // number of interval end points with value equal to key
         int topLevel;  // index of top level of forward pointers in this node.
@@ -79,25 +76,12 @@ namespace ISL {
             return is_header;
         }
 
-        void deleteMarks(IntervalList<Interval>* l);
+        //void deleteMarks(IntervalList<Interval>* l);
 
         ~IntervalSLnode();  // destructor
     };
 
 
-    template <class Interval_>
-    class Interval_for_container : public Interval_
-    {
-    private:
-        void * p;
-    public:
-        Interval_for_container(const Interval_& i)
-                : Interval_(i), p(NULL)
-        {}
-
-        void *   for_compact_container() const { return p; }
-        void * & for_compact_container()       { return p; }
-    };
 
 
     template <class Interval_>
@@ -106,8 +90,12 @@ namespace ISL {
     private:
         typedef Interval_ Interval;
         typedef typename Interval::Value Value;
-        Random random;
 
+        int maxLevel;
+
+        Random random;//need to be considered precisely
+
+        IntervalSLnode<Interval>* header;
 
         std::list<Interval> container;
 
@@ -116,51 +104,7 @@ namespace ISL {
         typedef IntervalListElt<Interval>* ILE_handle;
 
 
-        int maxLevel;
-        IntervalSLnode<Interval>* header;
-
         int randomLevel();  // choose a new node level at random
-
-        // place markers for Interval I.  I must have been inserted in the list.
-        // left is the left endpoint of I and right is the right endpoint if I.
-        // *** needs to be fixed:
-        void placeMarkers(IntervalSLnode<Interval>* left,
-                          IntervalSLnode<Interval>* right,
-                          const Interval_handle& I);
-
-
-        // remove markers for Interval I
-        void removeMarkers(const Interval_handle& I);
-
-
-        // adjust markers after insertion of x with update vector "update"
-        void adjustMarkersOnInsert(IntervalSLnode<Interval>* x,
-                                   IntervalSLnode<Interval>** update);
-
-
-        // adjust markers to prepare for deletion of x, which has update vector
-        // "update"
-        void adjustMarkersOnDelete(IntervalSLnode<Interval>* x,
-                                   IntervalSLnode<Interval>** update);
-
-
-        // remove node x, which has updated vector update.
-        void remove(IntervalSLnode<Interval>* x,
-                    IntervalSLnode<Interval>** update);
-
-
-        // remove markers for Interval I starting at left, the left endpoint
-        // of I, and and stopping at the right endpoint of I.
-        Interval_handle removeMarkers(IntervalSLnode<Interval>* left,
-                                      const Interval& I);
-
-
-        // Remove markers for interval m from the edges and nodes on the
-        // level i path from l to r.
-        void removeMarkFromLevel(const Interval& m, int i,
-                                 IntervalSLnode<Interval> *l,
-                                 IntervalSLnode<Interval>* r);
-
 
         // Search for search key, and return a pointer to the
         // intervalSLnode x found, as well as setting the update vector
@@ -169,13 +113,52 @@ namespace ISL {
                                          IntervalSLnode<Interval>** update);
 
 
+
         // insert a new single value
         // into list, returning a pointer to its location.
         IntervalSLnode<Interval>* insert(const Value& searchKey);
 
+        // adjust markers after insertion of x with update vector "update"
+        void adjustMarkersOnInsert(IntervalSLnode<Interval>* x,
+                                   IntervalSLnode<Interval>** update);
+
+        // place markers for Interval I.  I must have been inserted in the list.
+        // left is the left endpoint of I and right is the right endpoint if I.
+        // *** needs to be fixed:
+        void placeMarkers(IntervalSLnode<Interval>* left,
+                          IntervalSLnode<Interval>* right,
+                          const Interval_handle& I);
 
         // insert an interval into list
         void insert(const Interval_handle& I);
+
+
+
+        // remove markers for Interval I
+        void removeMarkers(const Interval_handle& I);
+
+
+
+        // remove markers for Interval I starting at left, the left endpoint
+        // of I, and and stopping at the right endpoint of I.
+        Interval_handle removeMarkers(IntervalSLnode<Interval>* left,
+                                      const Interval& I);
+
+        // Remove markers for interval m from the edges and nodes on the
+        // level i path from l to r.
+        void removeMarkFromLevel(const Interval& m, int i,
+                                 IntervalSLnode<Interval> *l,
+                                 IntervalSLnode<Interval>* r);
+
+        // adjust markers to prepare for deletion of x, which has update vector
+        // "update"
+        void adjustMarkersOnDelete(IntervalSLnode<Interval>* x,
+                                   IntervalSLnode<Interval>** update);
+
+        // remove node x, which has updated vector update.
+        void remove(IntervalSLnode<Interval>* x,
+                    IntervalSLnode<Interval>** update);
+
 
     public:
 
@@ -183,8 +166,7 @@ namespace ISL {
 
         Interval_skip_list();
 
-        //different from the origin use of boost library,
-        //we use the random of leveldb skiplist's random function.
+        //use the random of leveldb skiplist's random function.
         template <class InputIterator>
         Interval_skip_list(InputIterator b, InputIterator e):random(0xdeadbeef)
         {

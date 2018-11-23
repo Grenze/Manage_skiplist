@@ -14,7 +14,7 @@ typedef ISL::Interval_skip_list<Interval> Interval_skip_list;
 int main() {
     Interval_skip_list islSample;
     int i, n, d;
-    n=20;d=3;
+    n=10;d=3;
     std::vector<Interval> intervals(n);
     for(i=0;i<n;i++){
         intervals[i] = Interval(i, i+d);
@@ -32,6 +32,7 @@ int main() {
     }
 
     //std::ostream & osSample = std::cout;
+    //std::cout<<intervals[0];
 
     islSample.print(std::cout);
     islSample.printOrdered(std::cout);

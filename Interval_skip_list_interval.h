@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 #include <iostream>
-
+#include <cassert>
 
 namespace ISL {
 
@@ -73,7 +73,7 @@ Interval_skip_list_interval<V>::Interval_skip_list_interval(
         bool lb, bool rb)
         : lbound_(lb), rbound_(rb), inf_(i), sup_(s)
 {
-    //CGAL_precondition( !(inf_ > sup_) );
+    assert( !(inf_ > sup_) );
 }
 
 
