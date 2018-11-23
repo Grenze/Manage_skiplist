@@ -31,10 +31,10 @@ int main() {
         std::cout << std::endl;
     }
 
-    std::ostream & osSample = std::cout;
+    //std::ostream & osSample = std::cout;
 
-    islSample.print(osSample);
-    islSample.printOrdered(osSample);
+    islSample.print(std::cout);
+    islSample.printOrdered(std::cout);
 
     for(i = 0; i < n; i++) {
         islSample.remove(intervals[i]);
