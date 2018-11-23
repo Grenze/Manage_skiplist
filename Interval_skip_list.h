@@ -1195,7 +1195,7 @@ namespace ISL {
         //Increase height with probability 1 in kBranching
         static const unsigned int kBranching = 4;
         int height = 1;
-        while (height < maxLevel && ((random.Next() % kBranching) == 0)){
+        while (height < MAX_FORWARD && ((random.Next() % kBranching) == 0)){
             height++;
         }
         return height;
