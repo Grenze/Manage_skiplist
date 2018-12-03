@@ -137,8 +137,8 @@ problem:
 	insert(Interval_handle) no need to wrap Interval in handle
 	std::list<Interval> container, so there is interval_handle
 	container.push_front(I)
-	Interval_handle ih
-	replace . with ->
+	Interval_handle points to the position of Interval in container
+
 
 
 
