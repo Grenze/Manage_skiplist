@@ -1,4 +1,4 @@
-class Interval_skip_list_interval:
+class Interval_skip_list_interval
 private:
 	bool lbound, rbound
 	Value inf, sup
@@ -32,7 +32,7 @@ public:
 
 
 
-class Interval_skip_list:
+class Interval_skip_list
 private:
 	int maxLevel
 	Random random
@@ -46,17 +46,18 @@ private:
 	IntervalSLnode<Interval>* search(Key, IntervalSLnode<Interval>** update)
 
 	//insert interval
+	void insert(Interval_handle& I)//Interval_handle related to the interval container
 	IntervalSLnode<Interval>* insert(Key)
 	void adjustMarkersOnInsert(IntervalSLnode<Interval>* x,
 				   IntervalSLnode<Interval>** update)
-	void placeMarkers(IntervalSLnode<Interval>* left,
-			  IntervalSLndoe<Interval>* right, Interval_handle &I)
-	void insert(Interval_handle& I)//Interval_handle related to the interval container
-	//remove interval
-	Interval_handle removeMarkers<IntervalSLnode<Interval>* left, Interval& I)
         void removeMarkFromLevel(const Interval& m, int i,
                                  IntervalSLnode<Interval> *l,
                                  IntervalSLnode<Interval>* r)
+	void placeMarkers(IntervalSLnode<Interval>* left,
+			  IntervalSLndoe<Interval>* right, Interval_handle &I)
+	//remove interval
+	Interval_handle removeMarkers<IntervalSLnode<Interval>* left, Interval& I)
+
 	void adjustMarkersOnDelete(IntervalSLnode<Interval>* x,
 				 IntervalSLnode<Interval>** update)
         void remove(IntervalSLnode<Interval>* x, IntervalSLnode<Interval>** update)
@@ -132,7 +133,9 @@ public:
 
 
 
-
+problem:
+	insert(Interval_handle) no need to wrap Interval in handle
+	replace . with ->
 
 
 

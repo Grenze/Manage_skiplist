@@ -126,6 +126,12 @@ namespace ISL {
         void adjustMarkersOnInsert(IntervalSLnode<Interval>* x,
                                    IntervalSLnode<Interval>** update);
 
+        // Remove markers for interval m from the edges and nodes on the
+        // level i path from l to r.
+        void removeMarkFromLevel(const Interval& m, int i,
+                                 IntervalSLnode<Interval> *l,
+                                 IntervalSLnode<Interval>* r);
+
         // place markers for Interval I.  I must have been inserted in the list.
         // left is the left endpoint of I and right is the right endpoint if I.
         // *** needs to be fixed:
@@ -148,11 +154,6 @@ namespace ISL {
         Interval_handle removeMarkers(IntervalSLnode<Interval>* left,
                                       const Interval& I);
 
-        // Remove markers for interval m from the edges and nodes on the
-        // level i path from l to r.
-        void removeMarkFromLevel(const Interval& m, int i,
-                                 IntervalSLnode<Interval> *l,
-                                 IntervalSLnode<Interval>* r);
 
         // adjust markers to prepare for deletion of x, which has update vector
         // "update"
@@ -550,6 +551,24 @@ namespace ISL {
     }
 
     template <class Interval>
+    IntervalSLnode<Interval>*
+    Interval_skip_list<Interval>::search(const Value& searchKey)
+    {
+        IntervalSLnode<Interval>* x = header;
+        for(int i=maxLevel; i >= 0; i--) {
+            while (x->forward[i] != 0 && (x->forward[i]->key < searchKey)) {
+                x = x->forward[i];
+            }
+        }
+        x = x->forward[0];
+        if(x != NULL && (x->key == searchKey))
+            return(x);
+        else
+            return(NULL);
+    }
+
+
+    template <class Interval>
     void Interval_skip_list<Interval>::print(std::ostream& os) const
     {
         os << "\nAn Interval_skip_list:  \n";
@@ -563,14 +582,6 @@ namespace ISL {
     }
 
     template <class Interval>
-    std::ostream& operator<<(std::ostream& os,
-                             const Interval_skip_list<Interval>& isl)
-    {
-        isl.print(os);
-        return os;
-    }
-
-    template <class Interval>
     void Interval_skip_list<Interval>::printOrdered(std::ostream& os) const
     {
         IntervalSLnode<Interval>* n = header->get_next();
@@ -581,6 +592,15 @@ namespace ISL {
         }
         os << std::endl;
     }
+
+    template <class Interval>
+    std::ostream& operator<<(std::ostream& os,
+                             const Interval_skip_list<Interval>& isl)
+    {
+        isl.print(os);
+        return os;
+    }
+
 
     template <class Interval>
     void IntervalList<Interval>::copy(IntervalList* from)
@@ -604,6 +624,49 @@ namespace ISL {
             erase_list_element(y);
         }
         header=0;
+    }
+
+
+    template <class Interval>
+    IntervalSLnode<Interval>*
+    Interval_skip_list<Interval>::search(const Value& searchKey,
+                                         IntervalSLnode<Interval>** update)
+    {
+        IntervalSLnode<Interval>* x = header;
+        // Find location of searchKey, building update vector indicating
+        // pointers to change on insertion.
+        for(int i=maxLevel; i >= 0; i--) {
+            while (x->forward[i] != 0 && (x->forward[i]->key < searchKey)) {
+                x = x->forward[i];
+            }
+            update[i] = x;
+        }
+        x = x->forward[0];
+        return(x);
+    }
+
+    template <class Interval>
+    void
+    Interval_skip_list<Interval>::insert(const Interval& I)
+    {
+        container.push_front(I);
+        Interval_handle ih = container.begin();
+
+        insert(ih);
+    }
+
+    template <class Interval>
+    void Interval_skip_list<Interval>::insert(const Interval_handle& I)
+    // insert an interval into list
+    {
+        // insert end points of interval
+        IntervalSLnode<Interval>* left = this->insert(I->inf());
+        IntervalSLnode<Interval>* right = this->insert(I->sup());
+        left->ownerCount++;
+        right->ownerCount++;
+
+        // place markers on interval
+        this->placeMarkers(left,right,I);
     }
 
     template <class Interval>
@@ -642,6 +705,7 @@ namespace ISL {
         // else, the searchKey is in the list already, and x points to it.
         return(x);
     }
+
 
 
 
@@ -809,6 +873,177 @@ namespace ISL {
 
     } // end adjustMarkersOnInsert
 
+
+    template <class Interval>
+    void
+    Interval_skip_list<Interval>::removeMarkFromLevel(const Interval& m, int i,
+                                                      IntervalSLnode<Interval> *l,
+                                                      IntervalSLnode<Interval>* r)
+    {
+        IntervalSLnode<Interval> *x;
+        for(x=l; x!=0 && x!=r; x=x->forward[i]) {
+            x->markers[i]->remove(m);
+            x->eqMarkers->remove(m);
+        }
+        if(x!=0) x->eqMarkers->remove(m);
+    }
+
+
+    template <class Interval>
+    void
+    Interval_skip_list<Interval>::placeMarkers(IntervalSLnode<Interval>* left,
+                                               IntervalSLnode<Interval>* right,
+                                               const Interval_handle& I)
+    {
+        // Place markers for the interval I.  left is the left endpoint
+        // of I and right is the right endpoint of I, so it isn't necessary
+        // to search to find the endpoints.
+
+        IntervalSLnode<Interval>* x = left;
+        if (I->contains(x->key)) x->eqMarkers->insert(I);
+        int i = 0;  // start at level 0 and go up
+        while(x->forward[i]!=0 && I->contains_interval(x->key,x->forward[i]->key)){
+            // find level to put mark on
+            while(i!=x->level()-1
+                  && x->forward[i+1] != 0
+                  && I->contains_interval(x->key,x->forward[i+1]->key))
+                i++;
+            // Mark current level i edge since it is the highest edge out of
+            // x that contains I, except in the case where current level i edge
+            // is null, in which case it should never be marked.
+            if (x->forward[i] != 0) {
+                x->markers[i]->insert(I);
+                x = x->forward[i];
+                // Add I to eqMarkers set on node unless currently at right endpoint
+                // of I and I doesn't contain right endpoint.
+                if (I->contains(x->key)) x->eqMarkers->insert(I);
+            }
+        }
+
+        // mark non-ascending path
+        while(x->key != right->key) {
+            // find level to put mark on
+            while(i!=0 && (x->forward[i] == 0 ||
+                           !I->contains_interval(x->key,x->forward[i]->key)))
+                i--;
+            // At this point, we can assert that i=0 or x->forward[i]!=0 and
+            // I contains
+            // (x->key,x->forward[i]->key).  In addition, x is between left and
+            // right so i=0 implies I contains (x->key,x->forward[i]->key).
+            // Hence, the interval must be marked.  Note that it is impossible
+            // for us to be at the end of the list because x->key is not equal
+            // to right->key.
+            x->markers[i]->insert(I);
+            x = x->forward[i];
+            if (I->contains(x->key)) x->eqMarkers->insert(I);
+        }
+    }  // end placeMarkers
+
+
+
+
+
+
+    template <class Interval>
+    bool Interval_skip_list<Interval>::remove(const Interval& I)
+    {
+        // arrays for maintaining update pointers
+        IntervalSLnode<Interval>* update[MAX_FORWARD];
+
+        IntervalSLnode<Interval>* left = search(I.inf(),update);
+        if(left==0 || left->ownerCount <= 0) {
+            return false;
+        }
+
+        Interval_handle ih = removeMarkers(left,I);
+        container.erase(ih);
+        left->ownerCount--;
+        if(left->ownerCount == 0) remove(left,update);
+
+        // Note:  we search for right after removing left since some
+        // of left's forward pointers may point to right.  We don't
+        // want any pointers of update vector pointing to a node that is gone.
+
+        IntervalSLnode<Interval>* right = search(I.sup(),update);
+        if(right==0 || right->ownerCount <= 0) {
+            return false;
+        }
+        right->ownerCount--;
+        if(right->ownerCount == 0) remove(right,update);
+        return true;
+    }
+
+
+
+    template <class Interval>
+    typename Interval_skip_list<Interval>::Interval_handle
+    Interval_skip_list<Interval>::removeMarkers(IntervalSLnode<Interval>* left,
+                                                const Interval& I)
+    {
+        // Remove markers for interval I, which has left as it's left
+        // endpoint,  following a staircase pattern.
+
+        //    Interval_handle res=0, tmp=0; // af: assignment not possible with std::list
+        Interval_handle res, tmp;
+        // remove marks from ascending path
+        IntervalSLnode<Interval>* x = left;
+        if (I.contains(x->key)) {
+            if(x->eqMarkers->remove(I, tmp)){
+                res = tmp;
+            }
+        }
+        int i = 0;  // start at level 0 and go up
+        while(x->forward[i]!=0 && I.contains_interval(x->key,x->forward[i]->key)) {
+            // find level to take mark from
+            while(i!=x->level()-1
+                  && x->forward[i+1] != 0
+                  && I.contains_interval(x->key,x->forward[i+1]->key))
+                i++;
+            // Remove mark from current level i edge since it is the highest edge out
+            // of x that contains I, except in the case where current level i edge
+            // is null, in which case there are no markers on it.
+            if (x->forward[i] != 0) {
+                if(x->markers[i]->remove(I, tmp)){
+                    res = tmp;
+                }
+                x = x->forward[i];
+                // remove I from eqMarkers set on node unless currently at right
+                // endpoint of I and I doesn't contain right endpoint.
+                if (I.contains(x->key)){
+                    if(x->eqMarkers->remove(I, tmp)){
+                        res = tmp;
+                    }
+                }
+            }
+        }
+
+        // remove marks from non-ascending path
+        while(x->key != I.sup()) {
+            // find level to remove mark from
+            while(i!=0 && (x->forward[i] == 0 ||
+                           ! I.contains_interval(x->key,x->forward[i]->key)))
+                i--;
+            // At this point, we can assert that i=0 or x->forward[i]!=0 and
+            // I contains
+            // (x->key,x->forward[i]->key).  In addition, x is between left and
+            // right so i=0 implies I contains (x->key,x->forward[i]->key).
+            // Hence, the interval is marked and the mark must be removed.
+            // Note that it is impossible for us to be at the end of the list
+            // because x->key is not equal to right->key.
+            if(x->markers[i]->remove(I, tmp)){
+                res = tmp;
+            }
+            x = x->forward[i];
+            if (I.contains(x->key)){
+                if(x->eqMarkers->remove(I, tmp)){
+                    res = tmp;
+                }
+            }
+        }
+        //CGAL_assertion(*res == I);
+        return res;
+    }
+
     template <class Interval>
     void
     Interval_skip_list<Interval>::adjustMarkersOnDelete
@@ -909,34 +1144,7 @@ namespace ISL {
     }  // end adjustMarkersOnDelete
 
 
-    template <class Interval>
-    bool Interval_skip_list<Interval>::remove(const Interval& I)
-    {
-        // arrays for maintaining update pointers
-        IntervalSLnode<Interval>* update[MAX_FORWARD];
 
-        IntervalSLnode<Interval>* left = search(I.inf(),update);
-        if(left==0 || left->ownerCount <= 0) {
-            return false;
-        }
-
-        Interval_handle ih = removeMarkers(left,I);
-        container.erase(ih);
-        left->ownerCount--;
-        if(left->ownerCount == 0) remove(left,update);
-
-        // Note:  we search for right after removing left since some
-        // of left's forward pointers may point to right.  We don't
-        // want any pointers of update vector pointing to a node that is gone.
-
-        IntervalSLnode<Interval>* right = search(I.sup(),update);
-        if(right==0 || right->ownerCount <= 0) {
-            return false;
-        }
-        right->ownerCount--;
-        if(right->ownerCount == 0) remove(right,update);
-        return true;
-    }
 
     template <class Interval>
     void
@@ -954,202 +1162,6 @@ namespace ISL {
 
         // and finally deallocate it
         delete x;
-    }
-
-
-    template <class Interval>
-    IntervalSLnode<Interval>*
-    Interval_skip_list<Interval>::search(const Value& searchKey)
-    {
-        IntervalSLnode<Interval>* x = header;
-        for(int i=maxLevel; i >= 0; i--) {
-            while (x->forward[i] != 0 && (x->forward[i]->key < searchKey)) {
-                x = x->forward[i];
-            }
-        }
-        x = x->forward[0];
-        if(x != NULL && (x->key == searchKey))
-            return(x);
-        else
-            return(NULL);
-    }
-
-    template <class Interval>
-    IntervalSLnode<Interval>*
-    Interval_skip_list<Interval>::search(const Value& searchKey,
-                                         IntervalSLnode<Interval>** update)
-    {
-        IntervalSLnode<Interval>* x = header;
-        // Find location of searchKey, building update vector indicating
-        // pointers to change on insertion.
-        for(int i=maxLevel; i >= 0; i--) {
-            while (x->forward[i] != 0 && (x->forward[i]->key < searchKey)) {
-                x = x->forward[i];
-            }
-            update[i] = x;
-        }
-        x = x->forward[0];
-        return(x);
-    }
-
-
-
-    template <class Interval>
-    void Interval_skip_list<Interval>::insert(const Interval_handle& I)
-    // insert an interval into list
-    {
-        // insert end points of interval
-        IntervalSLnode<Interval>* left = this->insert(I->inf());
-        IntervalSLnode<Interval>* right = this->insert(I->sup());
-        left->ownerCount++;
-        right->ownerCount++;
-
-        // place markers on interval
-        this->placeMarkers(left,right,I);
-    }
-
-    template <class Interval>
-    void
-    Interval_skip_list<Interval>::insert(const Interval& I)
-    {
-        container.push_front(I);
-        Interval_handle ih = container.begin();
-
-        insert(ih);
-    }
-
-
-    template <class Interval>
-    void
-    Interval_skip_list<Interval>::placeMarkers(IntervalSLnode<Interval>* left,
-                                               IntervalSLnode<Interval>* right,
-                                               const Interval_handle& I)
-    {
-        // Place markers for the interval I.  left is the left endpoint
-        // of I and right is the right endpoint of I, so it isn't necessary
-        // to search to find the endpoints.
-
-        IntervalSLnode<Interval>* x = left;
-        if (I->contains(x->key)) x->eqMarkers->insert(I);
-        int i = 0;  // start at level 0 and go up
-        while(x->forward[i]!=0 && I->contains_interval(x->key,x->forward[i]->key)){
-            // find level to put mark on
-            while(i!=x->level()-1
-                  && x->forward[i+1] != 0
-                  && I->contains_interval(x->key,x->forward[i+1]->key))
-                i++;
-            // Mark current level i edge since it is the highest edge out of
-            // x that contains I, except in the case where current level i edge
-            // is null, in which case it should never be marked.
-            if (x->forward[i] != 0) {
-                x->markers[i]->insert(I);
-                x = x->forward[i];
-                // Add I to eqMarkers set on node unless currently at right endpoint
-                // of I and I doesn't contain right endpoint.
-                if (I->contains(x->key)) x->eqMarkers->insert(I);
-            }
-        }
-
-        // mark non-ascending path
-        while(x->key != right->key) {
-            // find level to put mark on
-            while(i!=0 && (x->forward[i] == 0 ||
-                           !I->contains_interval(x->key,x->forward[i]->key)))
-                i--;
-            // At this point, we can assert that i=0 or x->forward[i]!=0 and
-            // I contains
-            // (x->key,x->forward[i]->key).  In addition, x is between left and
-            // right so i=0 implies I contains (x->key,x->forward[i]->key).
-            // Hence, the interval must be marked.  Note that it is impossible
-            // for us to be at the end of the list because x->key is not equal
-            // to right->key.
-            x->markers[i]->insert(I);
-            x = x->forward[i];
-            if (I->contains(x->key)) x->eqMarkers->insert(I);
-        }
-    }  // end placeMarkers
-
-    template <class Interval>
-    typename Interval_skip_list<Interval>::Interval_handle
-    Interval_skip_list<Interval>::removeMarkers(IntervalSLnode<Interval>* left,
-                                                const Interval& I)
-    {
-        // Remove markers for interval I, which has left as it's left
-        // endpoint,  following a staircase pattern.
-
-        //    Interval_handle res=0, tmp=0; // af: assignment not possible with std::list
-        Interval_handle res, tmp;
-        // remove marks from ascending path
-        IntervalSLnode<Interval>* x = left;
-        if (I.contains(x->key)) {
-            if(x->eqMarkers->remove(I, tmp)){
-                res = tmp;
-            }
-        }
-        int i = 0;  // start at level 0 and go up
-        while(x->forward[i]!=0 && I.contains_interval(x->key,x->forward[i]->key)) {
-            // find level to take mark from
-            while(i!=x->level()-1
-                  && x->forward[i+1] != 0
-                  && I.contains_interval(x->key,x->forward[i+1]->key))
-                i++;
-            // Remove mark from current level i edge since it is the highest edge out
-            // of x that contains I, except in the case where current level i edge
-            // is null, in which case there are no markers on it.
-            if (x->forward[i] != 0) {
-                if(x->markers[i]->remove(I, tmp)){
-                    res = tmp;
-                }
-                x = x->forward[i];
-                // remove I from eqMarkers set on node unless currently at right
-                // endpoint of I and I doesn't contain right endpoint.
-                if (I.contains(x->key)){
-                    if(x->eqMarkers->remove(I, tmp)){
-                        res = tmp;
-                    }
-                }
-            }
-        }
-
-        // remove marks from non-ascending path
-        while(x->key != I.sup()) {
-            // find level to remove mark from
-            while(i!=0 && (x->forward[i] == 0 ||
-                           ! I.contains_interval(x->key,x->forward[i]->key)))
-                i--;
-            // At this point, we can assert that i=0 or x->forward[i]!=0 and
-            // I contains
-            // (x->key,x->forward[i]->key).  In addition, x is between left and
-            // right so i=0 implies I contains (x->key,x->forward[i]->key).
-            // Hence, the interval is marked and the mark must be removed.
-            // Note that it is impossible for us to be at the end of the list
-            // because x->key is not equal to right->key.
-            if(x->markers[i]->remove(I, tmp)){
-                res = tmp;
-            }
-            x = x->forward[i];
-            if (I.contains(x->key)){
-                if(x->eqMarkers->remove(I, tmp)){
-                    res = tmp;
-                }
-            }
-        }
-        //CGAL_assertion(*res == I);
-        return res;
-    }
-
-    template <class Interval>
-    void
-    Interval_skip_list<Interval>::removeMarkFromLevel(const Interval& m, int i,
-                                                      IntervalSLnode<Interval> *l,
-                                                      IntervalSLnode<Interval>* r)
-    {
-        IntervalSLnode<Interval> *x;
-        for(x=l; x!=0 && x!=r; x=x->forward[i]) {
-            x->markers[i]->remove(m);
-            x->eqMarkers->remove(m);
-        }
-        if(x!=0) x->eqMarkers->remove(m);
     }
 
 
