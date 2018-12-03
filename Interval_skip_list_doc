@@ -3,8 +3,8 @@ private:
 	bool lbound, rbound;
 	Value inf, sup;
 public:
-	contains_value;
-	contains_interval;
+	contains(value);
+	contains_interval(Value l, Value r);
 	operator == != <<
 
 template <class Interval_> 
@@ -59,7 +59,10 @@ private:
 				 IntervalSLnode<Interval>** update);
         void remove(IntervalSLnode<Interval>* x, IntervalSLnode<Interval>** update);
 public:
-	
+	Interval_skip_list() ~Interval_skip_list()
+	Interval_skip_list(InputIterator b, InputIterator e)
+
+
 
 
 

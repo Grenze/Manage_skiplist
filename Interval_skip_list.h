@@ -51,11 +51,9 @@ namespace ISL {
 
         IntervalSLnode(const Value& searchKey, int levels);  // constructor
         IntervalSLnode(int levels);  // constructor for the header
+        ~IntervalSLnode();  // destructor
 
         IntervalSLnode* get_next();
-
-
-        void print(std::ostream& os) const;
 
         const Value&
         getValue()
@@ -76,9 +74,11 @@ namespace ISL {
             return is_header;
         }
 
+        void print(std::ostream& os) const;
+
+
         //void deleteMarks(IntervalList<Interval>* l);
 
-        ~IntervalSLnode();  // destructor
     };
 
 
@@ -165,6 +165,8 @@ namespace ISL {
         friend class IntervalSLnode<Interval>;
 
         Interval_skip_list();
+        ~Interval_skip_list();
+
 
         //use the random of leveldb skiplist's random function.
         template <class InputIterator>
@@ -181,19 +183,16 @@ namespace ISL {
         }
 
 
-        ~Interval_skip_list();
-
-
         void clear();
 
+        //number of intervals
         int size() const
         {
             return container.size();
         }
 
 
-        // return node containing
-        // Value if found, otherwise null
+        // return node containing Value if found, otherwise null
         IntervalSLnode<Interval>* search(const Value& searchKey);
 
 
@@ -257,6 +256,8 @@ namespace ISL {
 
 
         bool remove(const Interval& I);  // delete an interval from list
+
+
         void print(std::ostream& os) const;
         void printOrdered(std::ostream& os) const;
 
