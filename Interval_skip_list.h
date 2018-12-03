@@ -418,6 +418,7 @@ namespace ISL {
         void print(std::ostream& os) const;
     };
 
+    //----------------------------------------------------------------
 
     template <class Interval>
     IntervalSLnode<Interval>::IntervalSLnode(const Value& searchKey, int levels)
@@ -513,6 +514,8 @@ namespace ISL {
         os << std::endl << std::endl;
     }
 
+    //----------------------------------------------------------------
+
     template <class Interval>
     Interval_skip_list<Interval>::Interval_skip_list():random(0xdeadbeef)
     {
@@ -572,7 +575,7 @@ namespace ISL {
     void Interval_skip_list<Interval>::print(std::ostream& os) const
     {
         os << "\nAn Interval_skip_list:  \n";
-        os << "|container| == " << container.size() << std::endl;
+        os << "|container| == " << container.size() << std::endl <<std::endl;
         IntervalSLnode<Interval>* n = header->get_next();
 
         while( n != 0 ) {
@@ -599,31 +602,6 @@ namespace ISL {
     {
         isl.print(os);
         return os;
-    }
-
-
-    template <class Interval>
-    void IntervalList<Interval>::copy(IntervalList* from)
-    {
-        ILE_handle e = from->header;
-        while(e!=NULL) {
-            insert(e->I);
-            e = e->next;
-        }
-    }
-
-
-    template <class Interval>
-    void IntervalList<Interval>::clear()
-    {
-        ILE_handle x = header;
-        ILE_handle y;
-        while(x!= NULL) { // was 0
-            y = x;
-            x = x->next;
-            erase_list_element(y);
-        }
-        header=0;
     }
 
 
@@ -1179,12 +1157,27 @@ namespace ISL {
     }
 
 
+    //----------------------------------------------------------------
+
+
+    template <class Interval>
+    inline IntervalList<Interval>::IntervalList()
+            :  header(NULL)
+    {}
+
+
+    template <class Interval>
+    inline IntervalList<Interval>::~IntervalList()
+    {
+        this->clear();
+    }
+
+
 
     template <class Interval>
     void IntervalList<Interval>::insert(const Interval_handle& I)
     {
         ILE_handle temp = create_list_element(I);
-        //temp->next = header;
         temp->set_next(header);
         header = temp;
     }
@@ -1247,6 +1240,76 @@ namespace ISL {
             this->remove(*(x->getInterval()));
     }
 
+
+    template <class Interval>
+    inline
+    typename IntervalList<Interval>::ILE_handle
+    IntervalList<Interval>::get_first()
+    {
+        return header;
+    }
+
+    template <class Interval>
+    inline
+
+    typename IntervalList<Interval>::ILE_handle
+    IntervalList<Interval>::get_next(ILE_handle element)
+    {
+        return element->next;
+    }
+
+    template <class Interval>
+    void IntervalList<Interval>::copy(IntervalList* from)
+    {
+        ILE_handle e = from->header;
+        while(e!=NULL) {
+            insert(e->I);
+            e = e->next;
+        }
+    }
+
+    template <class Interval>
+    inline
+    bool IntervalList<Interval>::contains(const Interval_handle& I) const
+    {
+        ILE_handle x = header;
+        while(x!=0 && I != x->I)
+            x = x->next;
+        if (x==NULL)
+            return false;
+        else
+            return true;
+    }
+
+
+    template <class Interval>
+    void IntervalList<Interval>::clear()
+    {
+        ILE_handle x = header;
+        ILE_handle y;
+        while(x!= NULL) { // was 0
+            y = x;
+            x = x->next;
+            erase_list_element(y);
+        }
+        header=0;
+    }
+
+
+    template <class Interval>
+    void IntervalList<Interval>::print(std::ostream& os) const
+    {
+        ILE_handle e = header;
+        while(e != NULL) {
+            e->print(os);
+            e = e->get_next();
+        }
+    }
+
+
+    //----------------------------------------------------------------
+
+
     // We need the default constructor for the compact_container
     template <class Interval>
     inline
@@ -1267,32 +1330,6 @@ namespace ISL {
     {}
 
 
-    template <class Interval>
-    inline
-    typename IntervalList<Interval>::ILE_handle
-    IntervalList<Interval>::get_first()
-    {
-        return header;
-    }
-
-    template <class Interval>
-    inline
-
-    typename IntervalList<Interval>::ILE_handle
-    IntervalList<Interval>::get_next(ILE_handle element)
-    {
-        return element->next;
-    }
-
-    template <class Interval>
-    void IntervalList<Interval>::print(std::ostream& os) const
-    {
-        ILE_handle e = header;
-        while(e != NULL) {
-            e->print(os);
-            e = e->get_next();
-        }
-    }
 
     template <class Interval>
     void IntervalListElt<Interval>::print(std::ostream& /*os*/) const
@@ -1306,32 +1343,9 @@ namespace ISL {
         */
     }
 
-    template <class Interval>
-    inline
-    bool IntervalList<Interval>::contains(const Interval_handle& I) const
-    {
-        ILE_handle x = header;
-        while(x!=0 && I != x->I)
-            x = x->next;
-        if (x==NULL)
-            return false;
-        else
-            return true;
-    }
 
 
 
-    template <class Interval>
-    inline IntervalList<Interval>::IntervalList()
-            :  header(NULL)
-    {}
-
-
-    template <class Interval>
-    inline IntervalList<Interval>::~IntervalList()
-    {
-        this->clear();
-    }
 
 
 } // namespace ISL
