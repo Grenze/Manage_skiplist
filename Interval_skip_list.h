@@ -34,6 +34,7 @@ namespace ISL {
     class IntervalSLnode  // interval skip list node
     {
     private:
+
         typedef Interval_ Interval;
         typedef typename Interval::Value Value;
         bool is_header;
@@ -46,7 +47,9 @@ namespace ISL {
         int ownerCount;  // number of interval end points with value equal to key
         int topLevel;  // index of top level of forward pointers in this node.
         // Levels are numbered 0..topLevel.
+
     public:
+
         friend class Interval_skip_list<Interval>;
 
         IntervalSLnode(const Value& searchKey, int levels);  // constructor
@@ -88,6 +91,7 @@ namespace ISL {
     class Interval_skip_list
     {
     private:
+
         typedef Interval_ Interval;
         typedef typename Interval::Value Value;
 
@@ -281,6 +285,8 @@ namespace ISL {
     template <class Interval_>
     class IntervalList
     {
+    private:
+
         typedef Interval_ Interval;
         typedef typename Interval::Value Value;
 
@@ -299,6 +305,7 @@ namespace ISL {
         friend class IntervalListElt<Interval>;
 
         IntervalList();
+        ~IntervalList();
 
         void insert(const Interval_handle& I);
 
@@ -356,13 +363,14 @@ namespace ISL {
 
         void print(std::ostream& os) const;
 
-        ~IntervalList();
     };
 
 
     template <class Interval_>
     class IntervalListElt
     {
+    private:
+
         typedef Interval_ Interval;
 
         typedef typename std::list<Interval>::iterator Interval_handle;
@@ -447,6 +455,64 @@ namespace ISL {
     }
 
     template <class Interval>
+    IntervalSLnode<Interval>::~IntervalSLnode()
+    {
+        for(int i = 0; i<=topLevel; i++)
+            delete markers[i];
+        delete [] forward;
+        delete [] markers;
+        delete eqMarkers;
+    }
+
+    template <class Interval>
+    IntervalSLnode<Interval>* IntervalSLnode<Interval>::get_next()
+    {
+        return(forward[0]);
+    }
+
+    template <class Interval>
+    void IntervalSLnode<Interval>::print(std::ostream& os) const
+    {
+        int i;
+        os << "IntervalSLnode key:  ";
+        if (! is_header) {
+            os << key;
+        }else {
+            os << "HEADER";
+        }
+        os << "\n";
+        os << "number of levels: " << level() << std::endl;
+        os << "owning intervals:  ";
+        os << "ownerCount = " << ownerCount << std::endl;
+        os <<  std::endl;
+        os << "forward pointers:\n";
+        for(i=0; i<=topLevel; i++)
+        {
+            os << "forward[" << i << "] = ";
+            if(forward[i] != NULL) {
+                os << forward[i]->getValue();
+            } else {
+                os << "NULL";
+            }
+            os << std::endl;
+        }
+        os << "markers:\n";
+        for(i=0; i<=topLevel; i++)
+        {
+            os << "markers[" << i << "] = ";
+            if(markers[i] != NULL) {
+                markers[i]->print(os);
+            } else {
+                os << "NULL";
+            }
+            os << "\n";
+        }
+        os << "EQ markers:  ";
+        eqMarkers->print(os);
+        os << std::endl << std::endl;
+    }
+
+    template <class Interval>
     Interval_skip_list<Interval>::Interval_skip_list():random(0xdeadbeef)
     {
         maxLevel = 0;
@@ -484,11 +550,6 @@ namespace ISL {
     }
 
     template <class Interval>
-    IntervalSLnode<Interval>* IntervalSLnode<Interval>::get_next()
-    {
-        return(forward[0]);
-    }
-    template <class Interval>
     void Interval_skip_list<Interval>::print(std::ostream& os) const
     {
         os << "\nAn Interval_skip_list:  \n";
@@ -508,7 +569,6 @@ namespace ISL {
         isl.print(os);
         return os;
     }
-
 
     template <class Interval>
     void Interval_skip_list<Interval>::printOrdered(std::ostream& os) const
@@ -848,15 +908,6 @@ namespace ISL {
         }
     }  // end adjustMarkersOnDelete
 
-    template <class Interval>
-    IntervalSLnode<Interval>::~IntervalSLnode()
-    {
-        for(int i = 0; i<=topLevel; i++)
-            delete markers[i];
-        delete [] forward;
-        delete [] markers;
-        delete eqMarkers;
-    }
 
     template <class Interval>
     bool Interval_skip_list<Interval>::remove(const Interval& I)
@@ -1115,48 +1166,6 @@ namespace ISL {
         return height;
     }
 
-
-    template <class Interval>
-    void IntervalSLnode<Interval>::print(std::ostream& os) const
-    {
-        int i;
-        os << "IntervalSLnode key:  ";
-        if (! is_header) {
-            os << key;
-        }else {
-            os << "HEADER";
-        }
-        os << "\n";
-        os << "number of levels: " << level() << std::endl;
-        os << "owning intervals:  ";
-        os << "ownerCount = " << ownerCount << std::endl;
-        os <<  std::endl;
-        os << "forward pointers:\n";
-        for(i=0; i<=topLevel; i++)
-        {
-            os << "forward[" << i << "] = ";
-            if(forward[i] != NULL) {
-                os << forward[i]->getValue();
-            } else {
-                os << "NULL";
-            }
-            os << std::endl;
-        }
-        os << "markers:\n";
-        for(i=0; i<=topLevel; i++)
-        {
-            os << "markers[" << i << "] = ";
-            if(markers[i] != NULL) {
-                markers[i]->print(os);
-            } else {
-                os << "NULL";
-            }
-            os << "\n";
-        }
-        os << "EQ markers:  ";
-        eqMarkers->print(os);
-        os << std::endl << std::endl;
-    }
 
 
     template <class Interval>

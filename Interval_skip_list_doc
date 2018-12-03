@@ -1,65 +1,65 @@
 class Interval_skip_list_interval:
 private:
-	bool lbound, rbound;
-	Value inf, sup;
+	bool lbound, rbound
+	Value inf, sup
 public:
-	contains(value);
-	contains_interval(Value l, Value r);
+	contains(value)
+	contains_interval(Value l, Value r)
 	operator == != <<
 
 
 template <class Interval_> 
-calss Interval_skip_list<-friend->IntervalSLnode, IntervalList<-friend->IntervalListElt;
+calss Interval_skip_list<-friend->IntervalSLnode, IntervalList<-friend->IntervalListElt
 
-const int MAX_FORWARD = 48;
+const int MAX_FORWARD = 48
 
 
 class IntervalSLnode:// interval skip list node
 private:
-	bool is_header;
-	Value key;
-	IntervalSLnode** forward;
-	IntervalList<Interval>** markers;
-	IntervalList<Interval>* eqMarkers;
-	int ownerCount, topLevel;
+	bool is_header
+	Value key
+	IntervalSLnode** forward
+	IntervalList<Interval>** markers
+	IntervalList<Interval>* eqMarkers
+	int ownerCount, topLevel
 public:
-	constructor ~ for head node and non-head node;(level random problem)
-	IntervalSLnode* get_next();
-	Value getValue();
-	int level();
-	bool isHeader();
-	void print();
+	constructor ~ for head node and non-head node(level random problem)
+	IntervalSLnode* get_next()
+	Value getValue()
+	int level()
+	bool isHeader()
+	void print()
 
 
 
 class Interval_skip_list:
 private:
-	int maxLevel;
-	Random random;
-	IntervalSLnode<Interval>* header;
-	std::list<Interval> container;
+	int maxLevel
+	Random random
+	IntervalSLnode<Interval>* header
+	std::list<Interval> container
 
-        typedef typename std::list<Interval>::iterator Interval_handle;
-        typedef IntervalListElt<Interval>* ILE_handle;
+        typedef typename std::list<Interval>::iterator Interval_handle
+        typedef IntervalListElt<Interval>* ILE_handle
 	
-	int randomLevel();
-	IntervalSLnode<Interval>* search(Key, IntervalSLnode<Interval>** update);
+	int randomLevel()
+	IntervalSLnode<Interval>* search(Key, IntervalSLnode<Interval>** update)
 
 	//insert interval
-	IntervalSLnode<Interval>* insert(Key);
+	IntervalSLnode<Interval>* insert(Key)
 	void adjustMarkersOnInsert(IntervalSLnode<Interval>* x,
-				   IntervalSLnode<Interval>** update);
+				   IntervalSLnode<Interval>** update)
 	void placeMarkers(IntervalSLnode<Interval>* left,
-			  IntervalSLndoe<Interval>* right, Interval_handle &I);
-	void insert(Interval_handle& I);//Interval_handle related to the interval container
+			  IntervalSLndoe<Interval>* right, Interval_handle &I)
+	void insert(Interval_handle& I)//Interval_handle related to the interval container
 	//remove interval
-	Interval_handle removeMarkers<IntervalSLnode<Interval>* left, Interval& I);
+	Interval_handle removeMarkers<IntervalSLnode<Interval>* left, Interval& I)
         void removeMarkFromLevel(const Interval& m, int i,
                                  IntervalSLnode<Interval> *l,
-                                 IntervalSLnode<Interval>* r);
+                                 IntervalSLnode<Interval>* r)
 	void adjustMarkersOnDelete(IntervalSLnode<Interval>* x,
-				 IntervalSLnode<Interval>** update);
-        void remove(IntervalSLnode<Interval>* x, IntervalSLnode<Interval>** update);
+				 IntervalSLnode<Interval>** update)
+        void remove(IntervalSLnode<Interval>* x, IntervalSLnode<Interval>** update)
 public:
 	Interval_skip_list() ~Interval_skip_list()
 	Interval_skip_list(InputIterator b, InputIterator e)
@@ -80,8 +80,55 @@ public:
 	
 	
 	
+class IntervalList
+private:
+        typedef typename std::list<Interval>::iterator Interval_handle
+        typedef IntervalListElt<Interval>* ILE_handle
+	ILE_handle header
+	std::allocator<IntervalListElt<Interval>> alloc
+public:
+	IntervalList() ~IntervalList()
+	insert(Interval_handle&)
+	remove(Interval&, Interval_handle& ret)
+	remove(Interval&)
+	removeAll(IntervalList*)
+	
+	TLE_handle create_list_element(Interval_handle&)
+	erase_list_element(TLE_handle)
+
+	ILE_handle get_first()
+	ILE_handle get_next(ILE_handle)
+
+	copy(IntervalList* from)
+
+	copy(OutputIterator out)
+
+	containes(Interval_handle&)
+
+	clear()
+
+	print(os)
+	
+
+class IntervalListElt
+private:
+        typedef Interval_ Interval;
+
+        typedef typename std::list<Interval>::iterator Interval_handle;
+
+        typedef IntervalListElt<Interval>* ILE_handle;
 
 
+        Interval_handle I;
+        ILE_handle next;
+
+public:
+	IntervalListElt() ~IntervalListElt()
+	IntervalListElt(Interval_handle&)
+	set_next(ILE_handle)
+	get_next()
+	getInterval()
+	print(os)
 
 
 
