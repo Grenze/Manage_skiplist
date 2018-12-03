@@ -7,10 +7,12 @@ public:
 	contains_interval(Value l, Value r);
 	operator == != <<
 
+
 template <class Interval_> 
 calss Interval_skip_list<-friend->IntervalSLnode, IntervalList<-friend->IntervalListElt;
 
 const int MAX_FORWARD = 48;
+
 
 class IntervalSLnode:// interval skip list node
 private:
@@ -61,6 +63,23 @@ private:
 public:
 	Interval_skip_list() ~Interval_skip_list()
 	Interval_skip_list(InputIterator b, InputIterator e)
+	clear()
+	size()
+	search(Value)
+	find_intervals(Values, OutputIterator out)
+	is_contained(Value)
+	insert(Interval)
+	insert(InputIterator b, InputIterator e)
+	remove(Interval)
+
+	print(os)
+	printOrdered(os)
+	
+	container.begin()
+	container.end()
+	
+	
+	
 
 
 

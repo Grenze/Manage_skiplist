@@ -257,12 +257,14 @@ namespace ISL {
 
         bool remove(const Interval& I);  // delete an interval from list
 
-
+        //print every nodes' information
         void print(std::ostream& os) const;
+        //print every nodes' values in order
         void printOrdered(std::ostream& os) const;
 
         typedef typename std::list<Interval>::const_iterator const_iterator;
 
+        //modify not allowed
         const_iterator begin() const
         {
             return container.begin();
@@ -281,7 +283,7 @@ namespace ISL {
     {
         typedef Interval_ Interval;
         typedef typename Interval::Value Value;
-        //typedef Interval* Interval_handle;
+
 
         typedef typename std::list<Interval>::iterator Interval_handle;
 
@@ -289,7 +291,7 @@ namespace ISL {
 
         ILE_handle header;
 
-        typedef std::allocator<IntervalListElt<Interval> > Alloc;
+        typedef std::allocator<IntervalListElt<Interval>> Alloc;
         Alloc alloc;
 
     public:
@@ -373,12 +375,13 @@ namespace ISL {
 
     public:
 
+        friend class IntervalList<Interval>;
+
         bool operator==(const IntervalListElt& e)
         {
             return ( ((*I) == (*(e.I))) && (next == e.next));
         }
 
-        friend class IntervalList<Interval>;
 
 
         IntervalListElt();
@@ -1160,7 +1163,8 @@ namespace ISL {
     void IntervalList<Interval>::insert(const Interval_handle& I)
     {
         ILE_handle temp = create_list_element(I);
-        temp->next = header;
+        //temp->next = header;
+        temp->set_next(header);
         header = temp;
     }
 
@@ -1176,6 +1180,7 @@ namespace ISL {
             last = x;
             x = x->next;
         }
+        //after the tail | at the head | in the between
         if(x==NULL) {
             return false;
         } else if (last==NULL) {
@@ -1201,6 +1206,7 @@ namespace ISL {
             last = x;
             x = x->next;
         }
+        //after the tail | at the head | in the between
         if(x==NULL) {
             return ;
         } else if (last==NULL) {
