@@ -139,6 +139,12 @@ problem:
 	container.push_front(I)
 	Interval_handle points to the position of Interval in container
 
+techniques:
+	persistent_ptr is smart ptr
+	transaction promises atomic consistent durability
+	data structure modify thread doesn't influence the read thread, which
+	means the read thread will never see a structure inconsistent, most import 
+	there is no hazard pointer
 
 
 
