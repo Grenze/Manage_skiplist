@@ -146,6 +146,9 @@ techniques:
 	means the read thread will never see a structure inconsistent, most import 
 	there is no hazard pointer
 
+attentions:
+	when modify the structure of root object; remove the pmem file to construct a new one 
+
 
 
 
