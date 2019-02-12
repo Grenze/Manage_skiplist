@@ -202,6 +202,11 @@ namespace ISL {
 
 
 
+        // It is assumed that when a marker is placed on an edge,
+        // it will be placed in the eqMarkers sets of a node on either
+        // end of the edge if the interval for the marker covers the node.
+        // Similarly, when a marker is removed from an edge markers will
+        // be removed from eqMarkers sets on nodes adjacent to the edge.
         template <class OutputIterator>
         OutputIterator
         find_intervals(const Value& searchKey, OutputIterator out )
@@ -509,7 +514,7 @@ namespace ISL {
             os << "markers[" << i << "] = ";
             if(markers[i] != NULL) {
                 markers[i]->print(os);
-                os << "("<<markers[i]->count<<")";
+                os << " ("<<markers[i]->count<<")";
             } else {
                 os << "NULL";
             }
@@ -517,7 +522,7 @@ namespace ISL {
         }
         os << "EQ markers:  ";
         eqMarkers->print(os);
-        os << "("<<eqMarkers->count<<")";
+        os << " ("<<eqMarkers->count<<")";
         os << std::endl << std::endl;
     }
 

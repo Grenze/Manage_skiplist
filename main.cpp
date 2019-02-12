@@ -16,9 +16,10 @@ int main() {
     int i, n, d;
     n=20;d=3;
     std::vector<Interval> intervals(n);
-    for(i=0;i<n;i++){
+    for(i=0;i<n-1;i++){
         intervals[i] = Interval(i, i+d);
     }
+    intervals[n-1] = Interval(0, 100);
     std::random_shuffle(intervals.begin(), intervals.end());
     islSample.insert(intervals.begin(), intervals.end());
 
