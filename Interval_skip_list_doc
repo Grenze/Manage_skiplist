@@ -9,7 +9,7 @@ public:
 
 
 template <class Interval_> 
-calss Interval_skip_list<-friend->IntervalSLnode, IntervalList<-friend->IntervalListElt
+class Interval_skip_list<-friend->IntervalSLnode, IntervalList<-friend->IntervalListElt
 
 const int MAX_FORWARD = 48
 
@@ -104,7 +104,7 @@ public:
 
 	copy(OutputIterator out)
 
-	containes(Interval_handle&)
+	contains(Interval_handle&)
 
 	clear()
 

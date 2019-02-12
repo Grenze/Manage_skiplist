@@ -301,7 +301,9 @@ namespace ISL {
         typedef std::allocator<IntervalListElt<Interval>> Alloc;
         Alloc alloc;
 
+
     public:
+        int count;
 
         friend class IntervalListElt<Interval>;
 
@@ -323,6 +325,7 @@ namespace ISL {
             IntervalListElt<Interval> *elt_ptr = alloc.allocate(1);
 
             alloc.construct(elt_ptr, I);
+            count++;
 
             return elt_ptr;
             //return new IntervalListElt<Interval>(I);
@@ -335,6 +338,8 @@ namespace ISL {
             alloc.destroy(I);
 
             alloc.deallocate(I,1);
+            count--;
+
             //delete I;
         }
 
@@ -504,6 +509,7 @@ namespace ISL {
             os << "markers[" << i << "] = ";
             if(markers[i] != NULL) {
                 markers[i]->print(os);
+                os << "("<<markers[i]->count<<")";
             } else {
                 os << "NULL";
             }
@@ -511,6 +517,7 @@ namespace ISL {
         }
         os << "EQ markers:  ";
         eqMarkers->print(os);
+        os << "("<<eqMarkers->count<<")";
         os << std::endl << std::endl;
     }
 
@@ -1018,7 +1025,6 @@ namespace ISL {
                 }
             }
         }
-        //CGAL_assertion(*res == I);
         return res;
     }
 
@@ -1332,15 +1338,15 @@ namespace ISL {
 
 
     template <class Interval>
-    void IntervalListElt<Interval>::print(std::ostream& /*os*/) const
+    void IntervalListElt<Interval>::print(std::ostream& os) const
     {
-        /*
-        if(I == 0) {
+
+        /*if(I == 0) {
           os << "NULL";
-        } else {
+        } else */{
           os << *I;
         }
-        */
+
     }
 
 
