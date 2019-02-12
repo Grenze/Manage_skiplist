@@ -150,7 +150,12 @@ attentions:
 	when modify the structure of root object; remove the pmem file to construct a new one 
 
 
+1. Construct a twoLevelIterator from ISL and nvm_imm_, to support pre()/next() function,
+   a IntervalSLnode should knows which interval's endpoint it is. So when twoLevelIterator
+   reaches IntervalSLnode(N1), N1's corresponding nvm_imm_'s iterator can be added to merger.
 
+2.  For ISL, there is no need to set container member. In stead, for nvm_versions_ intervals[?]
+    get in charge of intervals, like levelDB's files_[levels].
 
 
 
