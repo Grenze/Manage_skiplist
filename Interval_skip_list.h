@@ -38,7 +38,7 @@ namespace ISL {
         typedef Interval_ Interval;
         typedef typename Interval::Value Value;
         bool is_header;
-        typedef Interval* Interval_handle;
+        //typedef Interval* Interval_handle;
 
         Value key;
         IntervalSLnode** forward;  // array of forward pointers
