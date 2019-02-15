@@ -40,7 +40,7 @@ namespace ISL {
         bool is_header;
         //typedef Interval* Interval_handle;
 
-        Value key;
+        Value key;  // copy the Value
         IntervalSLnode** forward;  // array of forward pointers
         IntervalList<Interval>**   markers;  // array of interval markers, one for each pointer
         IntervalList<Interval>* eqMarkers;   // markers for node itself

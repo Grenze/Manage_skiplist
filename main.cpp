@@ -26,7 +26,7 @@ int main() {
 
     Interval_skip_list islSample;
     int i, n, d;
-    n=1000000;d=3;
+    n=20;d=3;
     std::vector<Interval> intervals(n);
     for(i=0;i<n-1;i++){
         intervals[i] = Interval(i, i+d);
@@ -38,17 +38,16 @@ int main() {
     for(i = 0; i < n+d; i++) {
         std::list<Interval> L;
         islSample.find_intervals(i, std::back_inserter(L));
-        //for(std::list<Interval>::iterator it = L.begin(); it != L.end(); it++){
-            //std::cout << *it;
-        //}
-        //std::cout << std::endl;
+        for(std::list<Interval>::iterator it = L.begin(); it != L.end(); it++){
+            std::cout << *it;
+        }
+        std::cout << std::endl;
     }
 
-    //std::ostream & osSample = std::cout;
-    //std::cout<<intervals[0];
 
-    //islSample.print(std::cout);
-    //islSample.printOrdered(std::cout);
+
+    islSample.print(std::cout);
+    islSample.printOrdered(std::cout);
 
     for(i = 0; i < n; i++) {
         islSample.remove(intervals[i]);
@@ -56,6 +55,9 @@ int main() {
 
     auto end_time = NowNanos();
     std::cout<< "nanosecond: "<<end_time - start_time <<std::endl;
+
+
+
 
 
 /*
