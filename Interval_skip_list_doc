@@ -158,7 +158,7 @@ attentions:
     get in charge of intervals, like levelDB's files_[levels].
 
 
-
+3. Tested: 1000 000 intervals inserted find_intervals and remove, costs 7.8s
 
 
 
