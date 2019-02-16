@@ -44,7 +44,10 @@ int main() {
         std::cout << std::endl;
     }
 
+    //Interval interval = Interval(1, 10);
 
+    //islSample.remove(interval);
+    //islSample.remove(interval);   error here.
 
     islSample.print(std::cout);
     islSample.printOrdered(std::cout);
