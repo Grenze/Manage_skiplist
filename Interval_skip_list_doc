@@ -163,7 +163,7 @@ attentions:
 
 
 4.  ISL node should keep the value from intervals. When remove an interval, node should know
-    whether itself belongs to this interval(owner_intervals).
+    whether itself belongs to this interval(owner_intervals). Use timestamp to differ them.
 
 
 
