@@ -17,11 +17,9 @@ namespace GISL {
         int operator()(const int& a, const int& b) const {
             if (a < b) {
                 return -1;
-            }
-            if (a == b) {
+            } else if (a == b) {
                 return 0;
-            }
-            if (a > b) {
+            } else if (a > b) {
                 return 1;
             }
         }

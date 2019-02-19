@@ -12,6 +12,7 @@
 
 #include "GISL_helper.h"
 
+
 typedef ISL::Interval_skip_list_interval<int> Interval;
 typedef ISL::Interval_skip_list<Interval> Interval_skip_list;
 
@@ -27,22 +28,28 @@ typedef GISL::KeyComparator GComparator;
 }
 
 int main() {
-    auto start_time = NowNanos();
+
 
     Interval_skip_list islSample;
 
-    const int n = 20, d = 3;
+    const int n = 2000, d = 3;
     int i;
 
+    auto start_time = NowNanos();
+
+
     std::vector<Interval> intervals(n);
-    for(i = 0; i < n-1; i++){
+    for(i = 0; i < n; i++){
         intervals[i] = Interval(i, i+d);
     }
-    intervals[n-1] = Interval(0, 100);
-    std::random_shuffle(intervals.begin(), intervals.end());
+    //std::random_shuffle(intervals.begin(), intervals.end());
+
+
+
+
     islSample.insert(intervals.begin(), intervals.end());
 
-    for(i = 0; i < n+d; i++) {
+    /*for(i = 0; i < n+d; i++) {
         std::list<Interval> L;
         islSample.find_intervals(i, std::back_inserter(L));
         for(std::list<Interval>::iterator it = L.begin(); it != L.end(); it++){
@@ -61,10 +68,10 @@ int main() {
 
     for(i = 0; i < n; i++) {
         islSample.remove(intervals[i]);
-    }
+    }*/
 
     auto end_time = NowNanos();
-    std::cout<< "nanosecond: "<<end_time - start_time <<std::endl;
+    std::cout<< "First Nanosecond: "<<end_time - start_time <<std::endl;
 
 
 //---------------------------------
@@ -75,35 +82,24 @@ int main() {
     GIntervalSkipList gSample = GIntervalSkipList(cmp);
 
 
-
+    start_time = NowNanos();
 
     for(i = 0; i < n; i++){
         gSample.index_.insert(intervals[i].inf() , intervals[i].sup());
     }
 
 
-/*
-    for(i = 0; i < n + d; i++) {
-        std::list<Interval> L;
-        const int a = i;
-        gSample.index_.find_intervals(&a, std::back_inserter(L));
-        for(std::list<Interval>::iterator it = L.begin(); it != L.end(); it++){
-            std::cout << *it;
-        }
-        std::cout << std::endl;
-    }*/
+    end_time = NowNanos();
+    std::cout<< "Second Nanosecond: "<<end_time - start_time <<std::endl;
 
-    //Interval interval = Interval(1, 10);
 
-    //gSample.remove(interval);
-    //gSample.remove(interval);   error here.
 
+    /*
     gSample.index_.print(std::cout);
     gSample.index_.printOrdered(std::cout);
+     */
 
-    for(i = 0; i < n; i++) {
-        //gSample.index_.remove(intervals[i].inf(), intervals[i].sup());
-    }
+
 
 
 
