@@ -10,8 +10,13 @@
 #include "Interval_skip_list_interval.h"
 #include "Interval_skip_list.h"
 
-typedef ISL::Interval_skip_list_interval<double> Interval;
+#include "GISL_helper.h"
+
+typedef ISL::Interval_skip_list_interval<int> Interval;
 typedef ISL::Interval_skip_list<Interval> Interval_skip_list;
+
+typedef GISL::GeneralIntervalSkipList GIntervalSkipList;
+typedef GISL::KeyComparator GComparator;
 
 
 
@@ -25,10 +30,12 @@ int main() {
     auto start_time = NowNanos();
 
     Interval_skip_list islSample;
-    int i, n, d;
-    n=20;d=3;
+
+    const int n = 20, d = 3;
+    int i;
+
     std::vector<Interval> intervals(n);
-    for(i=0;i<n-1;i++){
+    for(i = 0; i < n-1; i++){
         intervals[i] = Interval(i, i+d);
     }
     intervals[n-1] = Interval(0, 100);
@@ -58,6 +65,47 @@ int main() {
 
     auto end_time = NowNanos();
     std::cout<< "nanosecond: "<<end_time - start_time <<std::endl;
+
+
+//---------------------------------
+
+
+    std::cout<<"------------------------Gtest"<<std::endl;
+    GComparator cmp;
+    GIntervalSkipList gSample = GIntervalSkipList(cmp);
+
+
+
+
+    for(i = 0; i < n; i++){
+        gSample.index_.insert(intervals[i].inf() , intervals[i].sup());
+    }
+
+
+/*
+    for(i = 0; i < n + d; i++) {
+        std::list<Interval> L;
+        const int a = i;
+        gSample.index_.find_intervals(&a, std::back_inserter(L));
+        for(std::list<Interval>::iterator it = L.begin(); it != L.end(); it++){
+            std::cout << *it;
+        }
+        std::cout << std::endl;
+    }*/
+
+    //Interval interval = Interval(1, 10);
+
+    //gSample.remove(interval);
+    //gSample.remove(interval);   error here.
+
+    gSample.index_.print(std::cout);
+    gSample.index_.printOrdered(std::cout);
+
+    for(i = 0; i < n; i++) {
+        //gSample.index_.remove(intervals[i].inf(), intervals[i].sup());
+    }
+
+
 
 
 

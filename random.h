@@ -8,7 +8,6 @@
 
 #include <stdint.h>
 
-namespace ISL {
 
 // A very simple random number generator.  Not especially good at
 // generating truly random bits, but good enough for our needs in this
@@ -60,7 +59,6 @@ namespace ISL {
         }
     };
 
-}  // namespace ISL
 
 
 #endif //ISL_RANDOM_H
